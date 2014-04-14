@@ -248,25 +248,6 @@ build_dep() {
 		[ -n "${SAVE_DEP_CACHE}" ] && depcache_save lzo
 	fi
 
-	if [ -z "${DO_STATIC}" ]; then
-	  if [ -n "${USE_DEP_CACHE}" ]; then
-		depcache_extract pkcs11-helper
-	  else
-		echo "Build pkcs11-helper"
-		cd "${BUILDROOT}/pkcs11-helper"* || die "cd pkcs11-helper"
-		./configure ${CONFIGOPTS} ${EXTRA_PKCS11_HELPER_CONFIG} \
-			--disable-crypto-engine-gnutls \
-			--disable-crypto-engine-nss \
-			OPENSSL_CFLAGS="${OPENSSL_CRYPTO_CFLAGS}" \
-			OPENSSL_LIBS="${OPENSSL_CRYPTO_LIBS}" \
-			|| die "Configure pkcs11-helper"
-		${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${INSTALL_ROOT}" \
-			|| die "make pkcs11-helper"
-
-		[ -n "${SAVE_DEP_CACHE}" ] && depcache_save pkcs11-helper
-	  fi
-	fi
-
 	echo "tap-windows"
 	cp "${BUILDROOT}"/tap-windows-*/include/* "${OPENVPN_ROOT}/include" || die "tap-windows copy"
 
@@ -283,7 +264,7 @@ build_openvpn() {
 	echo "Build openvpn"
 	cd "${BUILDROOT}/openvpn-${OPENVPN_VERSION}" || die "cd openvpn"
 	./configure ${CONFIGOPTS} ${EXTRA_OPENVPN_CONFIG} \
-		$(empty_ifelse "${DO_STATIC}" --enable-pkcs11 --disable-plugins) \
+		$(empty_ifelse "${DO_STATIC}" --disable-plugins) \
 		--enable-lzo \
 		--with-special-build="${SPECIAL_BUILD}" \
 		|| die "Configure openvpn"
@@ -420,8 +401,6 @@ export OPENSSL_SSL_CFLAGS="-I${OPENVPN_ROOT}/include"
 export OPENSSL_SSL_LIBS="-L${OPENVPN_ROOT}/lib -lssl"
 export LZO_CFLAGS="-I${OPENVPN_ROOT}/include"
 export LZO_LIBS="-L${OPENVPN_ROOT}/lib -llzo2"
-export PKCS11_HELPER_CFLAGS="-I${OPENVPN_ROOT}/include"
-export PKCS11_HELPER_LIBS="-L${OPENVPN_ROOT}/lib -lpkcs11-helper"
 export TAP_CFLAGS="-I${OPENVPN_ROOT}/include"
 
 if [ -n "${BUILD_FOR_WINDOWS}" ]; then
