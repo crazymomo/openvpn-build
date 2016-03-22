@@ -1,0 +1,4 @@
+#!/bin/bash
+export PATH=/opt/Rossini/usr/bin/:$PATH
+export LD_LIBRARY_PATH=/opt/Rossini/usr/lib
+IMAGEROOT=`pwd`/image-arm CHOST=arm-linux CBUILD=x86_64-pc-linux-gnu ./build
